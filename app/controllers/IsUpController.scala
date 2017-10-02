@@ -14,9 +14,9 @@ class IsUpController @Inject()(wsClient: WSClient)(implicit ec: ExecutionContext
 
   val isItUpService = new IsUpService(wsClient)
 
-//  def isGoogleUp = Action.async { implicit request =>
-//    isItUpService(IsUpRequest("http://www.google.com")).map { isUpResponse =>
-//      if (isUpResponse.up) Ok("Google is Up") else BadGateway("Google is Down")
-//    }
-//  }
+  def isGoogleUp = Action.async { implicit request =>
+    isItUpService(IsUpRequest("http://www.google.com")).map { isUpResponse =>
+      if (isUpResponse.up) Ok("Google is Up") else BadGateway("Google is Down")
+    }
+  }
 }

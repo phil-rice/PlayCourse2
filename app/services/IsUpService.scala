@@ -1,19 +1,29 @@
 package services
 
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class IsUpRequest(url: String)
 
+
+object IsUpRequest {
+
+  implicit object BuildRequestForStatusRequest extends BuildRequestFrom[IsUpRequest] {
+    override def apply(ws: WSClient)(t: IsUpRequest): WSRequest = ws.url(t.url)
+  }
+
+}
+
 case class IsUpResult(url: String, up: Boolean)
 
-//class IsUpService(ws: WSClient)(implicit ex: ExecutionContext) extends (IsUpRequest => Future[IsUpResult]) {
-//  override def apply(req: IsUpRequest) = {
-//    ws.url(req.url).execute().map(wsResponse => wsResponse.status match {
-//      case 200 => IsUpResult(req.url, true)
-//      case _ => IsUpResult(req.url, false)
-//    }).fallbackTo { case _ => Future.successful(IsUpResult(req.url, false)) }
-//  }
-//}
+object IsUpResult {
 
+  implicit object BuildResponseForIsUpResult extends BuildFromResponse[IsUpRequest, IsUpResult] {
+    override def status200(req: IsUpRequest, response: WSResponse) = IsUpResult(req.url, true)
+    override def statusOther(req: IsUpRequest, response: WSResponse) =IsUpResult(req.url, true)
+  }
+
+}
+
+class IsUpService(ws: WSClient)(implicit ex: ExecutionContext) extends HttpService[IsUpRequest, IsUpResult](ws)
